@@ -175,6 +175,30 @@ This uses only two persistent SSH connections (one tunnel, one for TensorBoard).
 
 **Note:** The venv must already exist on the cluster (i.e., at least one job must have run) before TensorBoard can start.
 
+#### `gpus.sh`
+Shows a color-coded summary of GPU usage across the entire NOTS cluster: which nodes have free GPUs, which users are using them, and what jobs they're running.
+
+```bash
+./gpus.sh
+```
+
+Example output:
+```
+======================================
+  NOTS Cluster GPU Summary
+======================================
+
+bb6u11g1        [FREE]     4/4 free  lovelace   commons,scavenge
+bb6u17g1        [FULL]     0/4 free  lovelace   commons,scavenge
+    ns182 (4 GPU, orca_train)
+bc11u11n1       [PARTIAL]  1/2 free  volta      commons,scavenge
+    hhq1 (1 GPU, python_script)
+
+======================================
+Total: 108 GPUs  |  59 used  |  49 free
+======================================
+```
+
 #### `download.sh`
 Downloads the trained model weights (`best_model.pth` and `final_model.pth`) from the cluster to a local `./output/` directory.
 
