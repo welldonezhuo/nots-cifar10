@@ -29,7 +29,7 @@ You can verify it worked by running `ssh YOUR_NETID@nots.rice.edu` — it should
 ## Quick Start
 
 ```bash
-# 1. Edit the scripts to replace "vo9" with your NetID (see Customization below)
+# 1. Edit config.sh and set your Rice NetID
 # 2. Submit a training job
 ./launch.sh
 
