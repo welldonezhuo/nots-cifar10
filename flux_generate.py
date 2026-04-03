@@ -11,6 +11,7 @@ parser.add_argument("--output", type=str, default="flux-dev.png")
 args = parser.parse_args()
 
 hf_token = os.environ.get("HF_TOKEN")
+print(f"HF_TOKEN exists: {hf_token is not None}", flush=True)
 
 load_kwargs = {
     "pretrained_model_name_or_path": "black-forest-labs/FLUX.1-dev",
