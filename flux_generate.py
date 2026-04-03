@@ -12,20 +12,33 @@ parser.add_argument("--output", type=str, default="flux-dev.png")
 args = parser.parse_args()
 
 hf_token = os.environ.get("HF_TOKEN")
+hf_home = os.environ.get("HF_HOME")
+
 print(f"HF_TOKEN exists: {hf_token is not None}", flush=True)
-print(f"HF_HOME: {os.environ.get('HF_HOME')}", flush=True)
+print(f"HF_HOME: {hf_home}", flush=True)
 
 try:
+    if not hf_home:
+        raise RuntimeError("HF_HOME is not set")
+
+    os.makedirs(hf_home, exist_ok=True)
+
     print("Loading pipeline...", flush=True)
     pipe = FluxPipeline.from_pretrained(
         "black-forest-labs/FLUX.1-dev",
         torch_dtype=torch.bfloat16,
-        token=hf_token
+        token=hf_token,
+        cache_dir=hf_home
     )
 
     print("Pipeline loaded successfully", flush=True)
-    print("Enabling CPU offload...", flush=True)
-    pipe.enable_model_cpu_offload()
+
+    if torch.cuda.is_available():
+        print("Moving pipeline to CUDA...", flush=True)
+        pipe = pipe.to("cuda")
+    else:
+        print("CUDA not available, enabling CPU offload...", flush=True)
+        pipe.enable_model_cpu_offload()
 
     print("Generating image...", flush=True)
     image = pipe(
@@ -37,6 +50,10 @@ try:
         max_sequence_length=512,
         generator=torch.Generator("cpu").manual_seed(0)
     ).images[0]
+
+    output_dir = os.path.dirname(os.path.abspath(args.output))
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     print("Saving image...", flush=True)
     image.save(args.output)
