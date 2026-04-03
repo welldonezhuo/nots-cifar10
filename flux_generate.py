@@ -1,27 +1,32 @@
 import argparse
+import os
 import torch
 from diffusers import FluxPipeline
+
+print("=== SCRIPT STARTED ===")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--prompt", type=str, required=True)
 parser.add_argument("--output", type=str, default="flux-dev.png")
 args = parser.parse_args()
 
-print("Script started", flush=True)
-print(f"Output file: {args.output}", flush=True)
+hf_token = os.environ.get("HF_TOKEN")
 
-print("Loading pipeline...", flush=True)
-pipe = FluxPipeline.from_pretrained(
-    "black-forest-labs/FLUX.1-dev",
-    torch_dtype=torch.bfloat16
-)
+load_kwargs = {
+    "pretrained_model_name_or_path": "black-forest-labs/FLUX.1-dev",
+    "torch_dtype": torch.bfloat16,
+}
 
-print("Pipeline loaded", flush=True)
+if hf_token:
+    load_kwargs["token"] = hf_token
 
+print("Loading pipeline...")
+pipe = FluxPipeline.from_pretrained(**load_kwargs)
+
+print("Enabling CPU offload...")
 pipe.enable_model_cpu_offload()
-print("CPU offload enabled", flush=True)
 
-print("Starting generation...", flush=True)
+print("Generating image...")
 image = pipe(
     args.prompt,
     height=1024,
@@ -32,7 +37,6 @@ image = pipe(
     generator=torch.Generator("cpu").manual_seed(0)
 ).images[0]
 
-print("Generation finished", flush=True)
-
 image.save(args.output)
-print(f"Saved image to {args.output}", flush=True)
+print(f"Saved image to {args.output}")
+print("=== SCRIPT FINISHED ===")
