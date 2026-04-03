@@ -8,7 +8,7 @@ set -euo pipefail
 #SBATCH --cpus-per-task=4
 #SBATCH --mem-per-cpu=16G
 #SBATCH --gres=gpu:ampere:1
-#SBATCH --time=00:30:00
+#SBATCH --time=00:10:00
 #SBATCH --output=__SCRATCH__/flux_%j.out
 #SBATCH --error=__SCRATCH__/flux_%j.err
 
