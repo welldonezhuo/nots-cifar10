@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem-per-cpu=16G
 #SBATCH --gres=gpu:ampere:1
-#SBATCH --time=02:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=flux_%j.out
 #SBATCH --error=flux_%j.err
 
