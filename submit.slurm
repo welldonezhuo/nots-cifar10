@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 #SBATCH --job-name=flux-dev
 #SBATCH --partition=scavenge
 #SBATCH --account=commons
@@ -18,7 +19,11 @@ nvidia-smi
 
 module purge
 
-# Install packages in a self-contained venv, following the teacher's style
+export HF_HOME=__SCRATCH__/hf_cache
+export TRANSFORMERS_CACHE=__SCRATCH__/hf_cache
+export HF_HUB_CACHE=__SCRATCH__/hf_cache
+mkdir -p __SCRATCH__/hf_cache
+
 VENV_DIR=$HOME/venvs/flux
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment at $VENV_DIR ..."
@@ -34,11 +39,9 @@ fi
 echo "Python: $(which python)"
 echo "PyTorch version: $(python -c 'import torch; print(torch.__version__)')"
 echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available())')"
+echo "HF_HOME: $HF_HOME"
 
-# If you have a Hugging Face token, put it here
-# export HF_TOKEN=your_huggingface_token_here
-
-srun python flux_generate.py \
+srun --unbuffered python -u flux_generate.py \
     --prompt "A real polar bear wearing a red wool hat and a fabric bowtie, carrying a light wood board with the text 'comp646' on it, standing in front of a red brick wall, ultra photorealistic, professional wildlife photography, detailed fur texture, natural lighting, shallow depth of field, DSLR camera, 85mm lens, high dynamic range, sharp focus" \
     --output __SCRATCH__/flux-dev.png
 
